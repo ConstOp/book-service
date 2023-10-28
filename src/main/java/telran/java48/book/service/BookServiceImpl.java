@@ -75,9 +75,10 @@ public class BookServiceImpl implements BookService {
 	}
 
 	@Override
-	public Iterable<BookDto> findBooksByPablisher(String pablisherName) {
-		// TODO Auto-generated method stub
-		return null;
+	@Transactional(readOnly = true)
+	public Iterable<BookDto> findBooksByPablisher(String publisherName) {
+		return bookRepository.findByPublisherPublisherName(publisherName).map(b -> modelMapper.map(b, BookDto.class))
+				.collect(Collectors.toList());
 	}
 
 	@Override
@@ -93,8 +94,21 @@ public class BookServiceImpl implements BookService {
 	}
 
 	@Override
+	@Transactional
 	public AuthorDto removeAuthor(String authorName) {
-		// TODO Auto-generated method stub
+		Author author = authorRepository.findById(authorName).orElseThrow(EntityNotFounfException::new);
+		bookRepository.findByAuthorsName(authorName).map(b -> removeBookIsEmptyAuthors(b.getIsbn(), author)).collect(Collectors.toList());
+		authorRepository.delete(author);
+		return modelMapper.map(author, AuthorDto.class);
+	}
+
+	public Book removeBookIsEmptyAuthors(String isbn, Author author) {
+		Book book = bookRepository.findById(isbn).orElseThrow(EntityNotFounfException::new);
+		book.removeAuthor(author);
+		if (book.getAuthors().isEmpty()) {
+			bookRepository.deleteById(isbn);
+			return book;
+		}
 		return null;
 	}
 
