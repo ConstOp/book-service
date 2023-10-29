@@ -7,6 +7,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import ch.qos.logback.core.net.SyslogOutputStream;
 import lombok.RequiredArgsConstructor;
 import telran.java48.book.dao.AuthorRepository;
 import telran.java48.book.dao.BookRepository;
@@ -88,9 +89,10 @@ public class BookServiceImpl implements BookService {
 	}
 
 	@Override
+	@Transactional
 	public Iterable<String> findPablishersByAuthor(String authorName) {
-		// TODO Auto-generated method stub
-		return null;
+		authorRepository.findById(authorName).orElseThrow(EntityNotFounfException::new);
+		return bookRepository.findPublishersByAuthorsName(authorName).map(p->p.toString()).collect(Collectors.toList());
 	}
 
 	@Override
@@ -107,9 +109,8 @@ public class BookServiceImpl implements BookService {
 		book.removeAuthor(author);
 		if (book.getAuthors().isEmpty()) {
 			bookRepository.deleteById(isbn);
-			return book;
 		}
-		return null;
+		return book;
 	}
 
 }
