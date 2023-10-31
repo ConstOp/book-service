@@ -4,9 +4,12 @@ import java.io.Serializable;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 
@@ -28,9 +31,15 @@ public class Book implements Serializable {
 
 	@Id
 	String isbn;
+	@Column(name = "TITLE")
 	String title;
 //	@ManyToMany(cascade = CascadeType.ALL)
 	@ManyToMany
+	@JoinTable(
+			name = "BOOK_AUTHORS", 
+			joinColumns = @JoinColumn(name = "BOOK_ISBN"), 
+			inverseJoinColumns = @JoinColumn(name = "AUTHORS_NAME")
+	)
 	Set<Author> authors;
 	@ManyToOne
 	Publisher publisher;

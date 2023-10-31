@@ -69,9 +69,9 @@ public class BookServiceImpl implements BookService {
 	}
 
 	@Override
-	@Transactional(readOnly = true)
 	public Iterable<BookDto> findBooksByAuthor(String authorName) {
-		return bookRepository.findByAuthorsName(authorName)
+		Author author = authorRepository.findById(authorName).orElseThrow(EntityNotFounfException::new);
+		return author.getBooks().stream()
 				.map(b -> modelMapper.map(b, BookDto.class))
 				.collect(Collectors.toList());
 	}
@@ -79,7 +79,9 @@ public class BookServiceImpl implements BookService {
 	@Override
 	@Transactional(readOnly = true)
 	public Iterable<BookDto> findBooksByPablisher(String publisherName) {
-		return bookRepository.findByPublisherPublisherName(publisherName).map(b -> modelMapper.map(b, BookDto.class))
+		Publisher publisher = publisherRepository.findById(publisherName).orElseThrow(EntityNotFounfException::new);
+		return publisher.getBooks().stream()
+				.map(b -> modelMapper.map(b, BookDto.class))
 				.collect(Collectors.toList());
 	}
 
@@ -90,36 +92,19 @@ public class BookServiceImpl implements BookService {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(readOnly = true)
 	public Iterable<String> findPablishersByAuthor(String authorName) {
-		return publisherRepository.findByPublishersByAuthor(authorName);
+		return publisherRepository.findDistinctByBooksAuthorsName(authorName)
+				.map(Publisher::getPublisherName)
+				.collect(Collectors.toList());
 	}
 	
 	@Override
 	@Transactional
 	public AuthorDto removeAuthor(String authorName) {
 		Author author = authorRepository.findById(authorName).orElseThrow(EntityNotFounfException::new);
-		bookRepository.findByAuthorsName(authorName).forEach(b-> bookRepository.delete(b));
 		authorRepository.delete(author);
 		return modelMapper.map(author, AuthorDto.class);
 	}
-
-//	@Override
-//	@Transactional
-//	public AuthorDto removeAuthor(String authorName) {
-//		Author author = authorRepository.findById(authorName).orElseThrow(EntityNotFounfException::new);
-//		bookRepository.findByAuthorsName(authorName).map(b -> removeBookIsEmptyAuthors(b.getIsbn(), author)).collect(Collectors.toList());
-//		authorRepository.delete(author);
-//		return modelMapper.map(author, AuthorDto.class);
-//	}
-//
-//	public Book removeBookIsEmptyAuthors(String isbn, Author author) {
-//		Book book = bookRepository.findById(isbn).orElseThrow(EntityNotFounfException::new);
-//		book.removeAuthor(author);
-//		if (book.getAuthors().isEmpty()) {
-//			bookRepository.deleteById(isbn);
-//		}
-//		return book;
-//	}
 
 }
