@@ -12,6 +12,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -25,6 +26,7 @@ import lombok.Setter;
 @Setter
 @EqualsAndHashCode(of = "isbn")
 @Entity
+@Table(name = "BOOK")
 public class Book implements Serializable {
 
 	private static final long serialVersionUID = 7072174049171144815L;
