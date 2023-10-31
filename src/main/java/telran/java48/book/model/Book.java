@@ -29,7 +29,8 @@ public class Book implements Serializable {
 	@Id
 	String isbn;
 	String title;
-	@ManyToMany(cascade = CascadeType.ALL)
+//	@ManyToMany(cascade = CascadeType.ALL)
+	@ManyToMany
 	Set<Author> authors;
 	@ManyToOne
 	Publisher publisher;

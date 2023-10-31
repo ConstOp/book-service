@@ -71,7 +71,8 @@ public class BookServiceImpl implements BookService {
 	@Override
 	@Transactional(readOnly = true)
 	public Iterable<BookDto> findBooksByAuthor(String authorName) {
-		return bookRepository.findByAuthorsName(authorName).map(b -> modelMapper.map(b, BookDto.class))
+		return bookRepository.findByAuthorsName(authorName)
+				.map(b -> modelMapper.map(b, BookDto.class))
 				.collect(Collectors.toList());
 	}
 
@@ -91,26 +92,34 @@ public class BookServiceImpl implements BookService {
 	@Override
 	@Transactional
 	public Iterable<String> findPablishersByAuthor(String authorName) {
-		authorRepository.findById(authorName).orElseThrow(EntityNotFounfException::new);
-		return bookRepository.findPublishersByAuthorsName(authorName).map(p->p.toString()).collect(Collectors.toList());
+		return publisherRepository.findByPublishersByAuthor(authorName);
 	}
-
+	
 	@Override
 	@Transactional
 	public AuthorDto removeAuthor(String authorName) {
 		Author author = authorRepository.findById(authorName).orElseThrow(EntityNotFounfException::new);
-		bookRepository.findByAuthorsName(authorName).map(b -> removeBookIsEmptyAuthors(b.getIsbn(), author)).collect(Collectors.toList());
+		bookRepository.findByAuthorsName(authorName).forEach(b-> bookRepository.delete(b));
 		authorRepository.delete(author);
 		return modelMapper.map(author, AuthorDto.class);
 	}
 
-	public Book removeBookIsEmptyAuthors(String isbn, Author author) {
-		Book book = bookRepository.findById(isbn).orElseThrow(EntityNotFounfException::new);
-		book.removeAuthor(author);
-		if (book.getAuthors().isEmpty()) {
-			bookRepository.deleteById(isbn);
-		}
-		return book;
-	}
+//	@Override
+//	@Transactional
+//	public AuthorDto removeAuthor(String authorName) {
+//		Author author = authorRepository.findById(authorName).orElseThrow(EntityNotFounfException::new);
+//		bookRepository.findByAuthorsName(authorName).map(b -> removeBookIsEmptyAuthors(b.getIsbn(), author)).collect(Collectors.toList());
+//		authorRepository.delete(author);
+//		return modelMapper.map(author, AuthorDto.class);
+//	}
+//
+//	public Book removeBookIsEmptyAuthors(String isbn, Author author) {
+//		Book book = bookRepository.findById(isbn).orElseThrow(EntityNotFounfException::new);
+//		book.removeAuthor(author);
+//		if (book.getAuthors().isEmpty()) {
+//			bookRepository.deleteById(isbn);
+//		}
+//		return book;
+//	}
 
 }
