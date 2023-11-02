@@ -70,10 +70,6 @@ public class BookServiceImpl implements BookService {
 
 	@Override
 	public Iterable<BookDto> findBooksByAuthor(String authorName) {
-//		Author author = authorRepository.findById(authorName).orElseThrow(EntityNotFounfException::new);
-//		return author.getBooks().stream()
-//				.map(b -> modelMapper.map(b, BookDto.class))
-//				.collect(Collectors.toList());
 		return bookRepository.findByAuthorsName(authorName).map(b -> modelMapper.map(b, BookDto.class))
 				.collect(Collectors.toList());
 	}
@@ -81,10 +77,6 @@ public class BookServiceImpl implements BookService {
 	@Override
 	@Transactional(readOnly = true)
 	public Iterable<BookDto> findBooksByPablisher(String publisherName) {
-//		Publisher publisher = publisherRepository.findById(publisherName).orElseThrow(EntityNotFounfException::new);
-//		return publisher.getBooks().stream()
-//				.map(b -> modelMapper.map(b, BookDto.class))
-//				.collect(Collectors.toList());
 		return bookRepository.findByPublisherPublisherName(publisherName).map(b -> modelMapper.map(b, BookDto.class))
 				.collect(Collectors.toList());
 	}
@@ -98,9 +90,6 @@ public class BookServiceImpl implements BookService {
 	@Override
 	@Transactional(readOnly = true)
 	public Iterable<String> findPablishersByAuthor(String authorName) {
-//		return publisherRepository.findDistinctByBooksAuthorsName(authorName)
-//				.map(Publisher::getPublisherName)
-//				.collect(Collectors.toList());
 		return publisherRepository.findByPublishersByAuthor(authorName);
 	}
 
