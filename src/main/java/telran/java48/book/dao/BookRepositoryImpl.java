@@ -5,6 +5,7 @@ import java.util.stream.Stream;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
 
 import org.springframework.stereotype.Repository;
 
@@ -17,28 +18,27 @@ public class BookRepositoryImpl implements BookRepository {
 	@PersistenceContext
 	EntityManager em;
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public Stream<Book> findByAuthorsName(String authorName) {
-		return em.createQuery("select a.books from Author a where a.name=?1")
-				.setParameter(1, authorName)
-				.getResultStream();
+		TypedQuery<Book> query = em.createQuery("select b from Book b join b.authors where a.name=?1", Book.class);
+		query.setParameter(1, authorName);
+		return query.getResultStream();
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public Stream<Book> findByPublisherPublisherName(String publisherName) {
-		return em.createQuery("select p.books from Publisher p where p.publisherName=?1")
-				.setParameter(1, publisherName)
-				.getResultStream();
+		TypedQuery<Book> query = em.createQuery("select p.books from Publisher p where p.publisherName=?1", Book.class)
+				.setParameter(1, publisherName);
+		return query.getResultStream();
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public Stream<Publisher> findPublishersByAuthorsName(String authorName) {
-		return em.createQuery("select b.publisher from Book b join b.authors a where a.name = ?1 group by b.publisher")
-		.setParameter(1, authorName)
-		.getResultStream();
+		TypedQuery<Publisher> query = em
+				.createQuery("select b.publisher from Book b join b.authors a where a.name = ?1 group by b.publisher",
+						Publisher.class)
+				.setParameter(1, authorName);
+		return query.getResultStream();
 	}
 
 	@Override
